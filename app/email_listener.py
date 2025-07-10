@@ -3,7 +3,7 @@
 from imap_tools.mailbox import MailBox
 from imap_tools.query import AND
 from app.config import EMAIL_USER, EMAIL_PASSWORD, EMAIL_HOST
-from app.filters import is_placement_related
+from app.filters import analyze_placement_email
 from app.notifier.whatsapp import send_whatsapp_placement_alert
 
 
@@ -21,13 +21,32 @@ def check_for_new_emails():
             for msg in mailbox.fetch(AND(seen=False), limit=10, reverse=True):
                 subject = msg.subject or ""
                 sender = msg.from_ or ""
+                body = msg.text or msg.html or ""  # Get email body for LLM analysis
                 print(f"📩 New email from: {sender}, Subject: {subject}")
 
-                if is_placement_related(subject, sender):
-                    # TODO: Extract actual company/role later
-                    dummy_company = sender.split("@")[0] if "@" in sender else "Unknown"
-                    dummy_role = subject.split(" ")[0] if subject else "subject unknown"
-                    send_whatsapp_placement_alert(subject, dummy_company, dummy_role)
+                # Analyze email for placement information
+                analysis = analyze_placement_email(subject, sender, body)
+                
+                if analysis.get('is_placement_related', False):
+                    # Extract information from LLM analysis
+                    company = analysis.get('company', 'Unknown')
+                    role = analysis.get('role', 'Position')
+                    deadline = analysis.get('deadline')
+                    salary = analysis.get('salary')
+                    location = analysis.get('location')
+                    job_type = analysis.get('type')
+                    requirements = analysis.get('requirements')
+                    
+                    send_whatsapp_placement_alert(
+                        subject=subject, 
+                        company=company, 
+                        role=role,
+                        deadline=deadline,
+                        salary=salary,
+                        location=location,
+                        job_type=job_type,
+                        requirements=requirements
+                    )
                     print("✅ Placement alert triggered!")
                     if msg.uid:
                         mailbox.flag(msg.uid, "\\Seen", True)  # Mark as read
