@@ -17,7 +17,8 @@ def send_whatsapp_placement_alert(
     salary: Optional[str] = None,
     location: Optional[str] = None,
     job_type: Optional[str] = None,
-    requirements: Optional[str] = None
+    requirements: Optional[str] = None,
+    description: Optional[str] = None
 ) -> None:
     """
     Sends a WhatsApp message with detailed placement information.
@@ -45,6 +46,9 @@ def send_whatsapp_placement_alert(
             # Truncate requirements if too long
             req_text = requirements[:100] + "..." if len(requirements) > 100 else requirements
             message_body += f"✅ *Requirements:* {req_text}\n"
+        
+        if description:
+            message_body += f"📝 *Summary:*\n{description}\n"
         
         message_body += f"\n📧 *Subject:* {subject[:60]}{'...' if len(subject) > 60 else ''}\n"
         message_body += f"\n📬 Check your inbox for full details!"

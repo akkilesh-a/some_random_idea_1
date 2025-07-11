@@ -68,7 +68,7 @@ I need you to analyze the following email and determine if it's related to place
 EMAIL DETAILS:
 - Subject: "{subject}"
 - Sender: "{sender}"
-{f'- Body: "{body[:500]}{"..." if len(body) > 500 else ""}"' if body else ""}
+{f'- Body: "{body}"' if body else ""}
 
 ANALYSIS CRITERIA:
 Consider this email placement-related if it contains:
@@ -89,6 +89,15 @@ Consider this email placement-related if it contains:
  - Consider emails from placement cells, HR departments, and recruiting companies
  - Exclude spam, newsletters, or purely informational content not related to actual opportunities
 
+ FOR DESCRIPTION FIELD:
+ Provide a clear bullet-point summary of the email content. Include all important information such as:
+ • Key dates, times, and deadlines
+ • Registration windows and requirements  
+ • Test/interview details and duration
+ • Important links or instructions
+ • Eligibility criteria or restrictions
+ • Next steps or follow-up actions required
+
  RESPONSE FORMAT:
  Respond with a JSON object containing:
  {{
@@ -99,7 +108,8 @@ Consider this email placement-related if it contains:
    "salary": "Salary/CTC if mentioned, otherwise null",
    "location": "Job location if mentioned, otherwise null",
    "type": "Full-time/Internship/Contract/etc if identifiable, otherwise null",
-   "requirements": "Key requirements mentioned, otherwise null"
+   "requirements": "Key requirements mentioned, otherwise null",
+   "description": "A clear bullet-point summary of the email content covering key dates, times, deadlines, requirements, links, and action items. Format as: • Point 1 • Point 2 • Point 3"
  }}
 
  Return only the JSON object, no other text.
@@ -171,7 +181,8 @@ def analyze_placement_email_llm(
                 'salary': None,
                 'location': None,
                 'type': None,
-                'requirements': None
+                'requirements': None,
+                'description': None
             }
             
             for field, default in expected_fields.items():
@@ -233,7 +244,8 @@ def _fallback_placement_analysis(subject: str, sender: str) -> Dict[str, Any]:
         'salary': None,
         'location': None,
         'type': None,
-        'requirements': None
+        'requirements': None,
+        'description': None
     }
 
 

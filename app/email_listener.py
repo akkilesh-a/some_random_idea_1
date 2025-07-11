@@ -36,6 +36,7 @@ def check_for_new_emails():
                     location = analysis.get('location')
                     job_type = analysis.get('type')
                     requirements = analysis.get('requirements')
+                    description = analysis.get('description')
                     
                     send_whatsapp_placement_alert(
                         subject=subject, 
@@ -45,7 +46,8 @@ def check_for_new_emails():
                         salary=salary,
                         location=location,
                         job_type=job_type,
-                        requirements=requirements
+                        requirements=requirements,
+                        description=description
                     )
                     print("✅ Placement alert triggered!")
                     if msg.uid:
