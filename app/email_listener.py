@@ -5,6 +5,7 @@ from imap_tools.query import AND
 from app.config import EMAIL_USER, EMAIL_PASSWORD, EMAIL_HOST
 from app.filters import analyze_placement_email
 from app.notifier.whatsapp import send_whatsapp_placement_alert
+from app.attachment_processor import process_excel_attachments, format_attachment_summary
 
 
 def check_for_new_emails():
@@ -38,6 +39,11 @@ def check_for_new_emails():
                     requirements = analysis.get('requirements')
                     description = analysis.get('description')
                     
+                    # Process attachments for Excel files
+                    print("🔍 Checking attachments for student information...")
+                    attachment_result = process_excel_attachments(msg)
+                    attachment_summary = format_attachment_summary(attachment_result)
+                    
                     send_whatsapp_placement_alert(
                         subject=subject, 
                         company=company, 
@@ -47,7 +53,8 @@ def check_for_new_emails():
                         location=location,
                         job_type=job_type,
                         requirements=requirements,
-                        description=description
+                        description=description,
+                        attachment_info=attachment_summary
                     )
                     print("✅ Placement alert triggered!")
                     if msg.uid:

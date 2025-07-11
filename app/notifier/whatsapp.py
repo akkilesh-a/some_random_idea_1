@@ -18,7 +18,8 @@ def send_whatsapp_placement_alert(
     location: Optional[str] = None,
     job_type: Optional[str] = None,
     requirements: Optional[str] = None,
-    description: Optional[str] = None
+    description: Optional[str] = None,
+    attachment_info: Optional[str] = None
 ) -> None:
     """
     Sends a WhatsApp message with detailed placement information.
@@ -41,15 +42,22 @@ def send_whatsapp_placement_alert(
             
         if deadline:
             message_body += f"⏰ *Deadline:* {deadline}\n"
-            
+        
+        # Add spacing before requirements section
         if requirements:
             # Truncate requirements if too long
             req_text = requirements[:100] + "..." if len(requirements) > 100 else requirements
-            message_body += f"✅ *Requirements:* {req_text}\n"
+            message_body += f"\n✅ *Requirements:* {req_text}\n"
         
+        # Add spacing before summary section
         if description:
-            message_body += f"📝 *Summary:*\n{description}\n"
+            message_body += f"\n📝 *Summary:*\n{description}\n"
         
+        # Add spacing before attachment section
+        if attachment_info:
+            message_body += f"\n📎 *Attachments:*\n{attachment_info}\n"
+        
+        # Add spacing before subject and final message
         message_body += f"\n📧 *Subject:* {subject[:60]}{'...' if len(subject) > 60 else ''}\n"
         message_body += f"\n📬 Check your inbox for full details!"
 
